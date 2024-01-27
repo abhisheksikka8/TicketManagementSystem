@@ -1,1 +1,10 @@
-com/sapient/bookmymovie/BookmymovieApplication.class
+com/sapient/bookmymovie/data/repository/ScreenRepository.class
+com/sapient/bookmymovie/BookMyMovieApplication.class
+com/sapient/bookmymovie/data/repository/UserRepository.class
+com/sapient/bookmymovie/data/repository/TheatreRepository.class
+com/sapient/bookmymovie/data/entity/Screening.class
+com/sapient/bookmymovie/data/entity/User.class
+com/sapient/bookmymovie/data/entity/Theatre.class
+com/sapient/bookmymovie/data/entity/Screen.class
+com/sapient/bookmymovie/data/entity/Ticket.class
+com/sapient/bookmymovie/data/repository/TicketRepository.class

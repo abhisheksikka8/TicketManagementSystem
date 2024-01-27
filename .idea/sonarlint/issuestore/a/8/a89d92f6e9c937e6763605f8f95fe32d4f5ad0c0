@@ -1,0 +1,35 @@
+
+7
+java:S1643P"Use a StringBuilder instead.(¥¡œÑøÿÿÿÿ
+2
+java:S1643R"Use a StringBuilder instead.(ªóùü
+R
+java:S2629I"7Use the built-in formatting to construct this argument.(ï†¸Ôøÿÿÿÿ
+V
+java:S2184“"@Cast one of the operands of this addition operation to a "long".(Ô÷µY
+W
+java:S2184–"@Cast one of the operands of this addition operation to a "long".(ïËà»
+\
+java:S2184˜"@Cast one of the operands of this addition operation to a "long".(Ã¸­øÿÿÿÿ
+W
+java:S2184›"@Cast one of the operands of this addition operation to a "long".(Ü©²é
+f	java:S116%"QRename this field "LOGGER" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‘Â¯¢
+X
+java:S6813'"BRemove this field injection and use constructor injection instead.(êæÄŞ
+\
+java:S3457I"AFormat specifiers should be used instead of string concatenation.(ï†¸Ôøÿÿÿÿ
+H
+java:S1874I"-Remove this use of "getId"; it is deprecated.(ï†¸Ôøÿÿÿÿ
+[
+java:S2147{"ECombine this catch with the one at line 121, which has the same body.(ï­£Ä
+b
+java:S2677r"LUse or store the value returned from "readLine" instead of throwing it away.(£ÂÙî
+g
+java:S2677s"LUse or store the value returned from "readLine" instead of throwing it away.(ªÿÑ­ûÿÿÿÿ
+V	java:S125v"<This block of commented-out lines of code should be removed.(¿™Š…şÿÿÿÿ
+4
+java:S2119‘"Save and re-use this "Random".(¼İÅf
+F
+java:S1874´"/Remove this use of "getDate"; it is deprecated.(é¬âó
+F
+java:S1874´"/Remove this use of "getDate"; it is deprecated.(é¬âó

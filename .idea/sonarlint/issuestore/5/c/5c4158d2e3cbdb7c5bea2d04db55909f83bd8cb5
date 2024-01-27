@@ -1,0 +1,39 @@
+
+>
+java:S1643Q"Use a StringBuilder instead.(¥¡œÑøÿÿÿÿ8ç©ÿÒÔ1
+9
+java:S1643S"Use a StringBuilder instead.(ªóùü8ç©ÿÒÔ1
+Y
+java:S2629J"7Use the built-in formatting to construct this argument.(ï†¸Ôøÿÿÿÿ8é©ÿÒÔ1
+^
+java:S2184Œ"@Cast one of the operands of this addition operation to a "long".(Íõ–…8ê©ÿÒÔ1
+^
+java:S2184"@Cast one of the operands of this addition operation to a "long".(Â ¿Ó8¯‚–ÓÔ1
+]
+java:S2184”"@Cast one of the operands of this addition operation to a "long".(Ô÷µY8ë©ÿÒÔ1
+^
+java:S2184—"@Cast one of the operands of this addition operation to a "long".(ïËà»8±‚–ÓÔ1
+c
+java:S2184™"@Cast one of the operands of this addition operation to a "long".(Ã¸­øÿÿÿÿ8ó‡ÓÔ1
+^
+java:S2184œ"@Cast one of the operands of this addition operation to a "long".(Ü©²é8ô‡ÓÔ1
+m	java:S116&"QRename this field "LOGGER" to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(‘Â¯¢8ü©ÿÒÔ1
+_
+java:S6813("BRemove this field injection and use constructor injection instead.(êæÄŞ8ü©ÿÒÔ1
+c
+java:S3457J"AFormat specifiers should be used instead of string concatenation.(ï†¸Ôøÿÿÿÿ8„ªÿÒÔ1
+O
+java:S1874J"-Remove this use of "getId"; it is deprecated.(ï†¸Ôøÿÿÿÿ8„ªÿÒÔ1
+b
+java:S2147|"ECombine this catch with the one at line 122, which has the same body.(ï­£Ä8‰ªÿÒÔ1
+i
+java:S2677s"LUse or store the value returned from "readLine" instead of throwing it away.(£ÂÙî8‹ªÿÒÔ1
+n
+java:S2677t"LUse or store the value returned from "readLine" instead of throwing it away.(ªÿÑ­ûÿÿÿÿ8ŒªÿÒÔ1
+]	java:S125w"<This block of commented-out lines of code should be removed.(¿™Š…şÿÿÿÿ8ªÿÒÔ1
+;
+java:S2119’"Save and re-use this "Random".(¼İÅf8”ªÿÒÔ1
+M
+java:S1874µ"/Remove this use of "getDate"; it is deprecated.(é¬âó8šªÿÒÔ1
+M
+java:S1874µ"/Remove this use of "getDate"; it is deprecated.(é¬âó8šªÿÒÔ1
