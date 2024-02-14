@@ -1,10 +1,18 @@
 package com.sapient.bookmymovie.data.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.util.List;
 
 
 @Entity
 @Table(name = "THEATRE")
+@Getter
+@Setter
+@ToString
 public class Theatre {
     @Id
     @Column(name = "THEATRE_ID")
@@ -12,30 +20,11 @@ public class Theatre {
     private long theatreId;
     @Column(name = "THEATRE_NAME")
     private String theatreName;
-    @Column(name = "THEATRE_CITY")
-    private String theatreCity;
 
-    public long getTheatreId() {
-        return theatreId;
-    }
+    @Column(name = "THEATRE_CITY_ID")
+    private Integer theatreCity;
 
-    public void setTheatreId(long theatreId) {
-        this.theatreId = theatreId;
-    }
-
-    public String getTheatreName() {
-        return theatreName;
-    }
-
-    public void setTheatreName(String theatreName) {
-        this.theatreName = theatreName;
-    }
-
-    public String getTheatreCity() {
-        return theatreCity;
-    }
-
-    public void setTheatreCity(String theatreCity) {
-        this.theatreCity = theatreCity;
-    }
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "THEATRE_ID")
+    private List<Screen> screens;
 }

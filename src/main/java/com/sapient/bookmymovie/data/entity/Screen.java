@@ -1,41 +1,45 @@
 package com.sapient.bookmymovie.data.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Entity
 @Table(name = "SCREEN")
+@Getter
+@Setter
+@ToString
 public class Screen {
     @Id
     @Column(name = "SCREEN_ID")
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long screenId;
-    @Column(name = "THEATRE_ID")
-    private long theatreId;
-    @Column(name = "SEATS_NUM")
+    @Column(name = "SEATS_NUM", nullable = false)
     private int seatsNum;
 
-    public long getScreenId() {
-        return screenId;
-    }
+    @Column(name = "SCREEN_NAME", nullable = false)
+    private String screeName;
 
-    public void setScreenId(long screenId) {
-        this.screenId = screenId;
-    }
+    @Column(name = "THEATRE_ID", nullable = false)
+    private Long theatreId;
 
-    public long getTheatreId() {
-        return theatreId;
-    }
+    @OneToMany
+    @JoinColumn(name = "SCREEN_ID")
+    private List<Seat> seats;
 
-    public void setTheatreId(long theatreId) {
-        this.theatreId = theatreId;
-    }
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "SCREEN_ID")
+    private List<Show> shows;
 
-    public int getSeatsNum() {
-        return seatsNum;
-    }
 
-    public void setSeatsNum(int seatsNum) {
-        this.seatsNum = seatsNum;
+    public List<Show> getShowsByMovieAndSelectedDate(Long movieId, LocalDate selectedDate) {
+        return this.getShows().stream().filter(show ->
+                show.isShowOfSameDateAndMovie(movieId, selectedDate)).toList();
     }
 }

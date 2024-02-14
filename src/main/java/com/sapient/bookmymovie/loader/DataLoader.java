@@ -1,15 +1,7 @@
 package com.sapient.bookmymovie.loader;
 
-import com.sapient.bookmymovie.data.entity.Movie;
-import com.sapient.bookmymovie.data.entity.Screen;
-import com.sapient.bookmymovie.data.entity.Screening;
-import com.sapient.bookmymovie.data.repository.MovieRepository;
-import com.sapient.bookmymovie.data.repository.ScreenRepository;
-import com.sapient.bookmymovie.data.repository.ScreeningRepository;
-import org.jsoup.HttpStatusException;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
+import com.sapient.bookmymovie.data.entity.*;
+import com.sapient.bookmymovie.data.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,106 +10,65 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.HttpStatusCodeException;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Date;
-import java.sql.Time;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
+import java.time.LocalDateTime;
+import java.time.Month;
 
 @Component
 public class DataLoader implements ApplicationRunner {
+    @Autowired
     private MovieRepository movieRepository;
+    @Autowired
     private ScreenRepository screenRepository;
-    private ScreeningRepository screeningRepository;
+    @Autowired
+    private ShowRepository showRepository;
+    @Autowired
+    private CityRepository cityRepository;
+    @Autowired
+    private TheatreRepository theatreRepository;
+
+    @Autowired
+    private SeatRepository seatRepository;
+
+    @Autowired
+    private UserRepository userRepository;
     private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
     private TaskExecutor taskExecutor;
 
-    public MovieRepository getMovieRepository() {
-        return movieRepository;
-    }
-
-    public ScreeningRepository getScreeningRepository() {
-        return screeningRepository;
-    }
-
-    public ScreenRepository getScreenRepository() {
-        return screenRepository;
-    }
-
-    @Autowired
-    public DataLoader(MovieRepository movieRepository, ScreeningRepository screeningRepository,
-                      ScreenRepository screenRepository) {
-        this.movieRepository = movieRepository;
-        this.screeningRepository = screeningRepository;
-        this.screenRepository = screenRepository;
-    }
-
     private class ProcessMovie implements Runnable {
         private String movieLine;
-        private String linkLine;
 
-        ProcessMovie(String movieLine, String linkLine) {
+        ProcessMovie(String movieLine) {
             this.movieLine = movieLine;
-            this.linkLine = linkLine;
         }
 
         @Override
         public void run() {
-            LOGGER.info(Thread.currentThread().getId() + ":" + linkLine);
             String[] movieInfo = movieLine.split(",");
-
-            String movieName = "";
-
-            for (int i = 1; i < movieInfo.length-1; i++) {
-                if (i == movieInfo.length-2)
-                    movieName += movieInfo[i];
-                else
-                    movieName += movieInfo[i] + ",";
-            }
 
             Movie movie = new Movie();
             movie.setMovieId(Long.parseLong(movieInfo[0]));
-            movie.setMovieName(movieName.substring(0, movieName.indexOf('(')).trim());
+            movie.setMovieName(movieInfo[1]);
             movie.setMovieTags(movieInfo[2]);
-
-            String[] linkInfo = linkLine.split(",");
-            Document movieLensPage = null;
-            try {
-                movieLensPage = Jsoup.connect("https://www.imdb.com/title/tt" + linkInfo[1]).get();
-            } catch (HttpStatusCodeException e) {
-                return;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            if (movieLensPage != null) {
-                Element image = movieLensPage.getElementsByClass("poster").first().children().first().children().first();
-                movie.setMoviePosterUrl(image.attr("src"));
-            }
+            movie.setMoviePosterUrl(movieInfo[3]);
 
             movieRepository.save(movie);
         }
     }
 
     private void populateMovieTable() {
-        try (BufferedReader brMovies = new BufferedReader(new InputStreamReader(new ClassPathResource("movies.medium.csv").getInputStream()));
-               BufferedReader brLinks = new BufferedReader(new InputStreamReader(new ClassPathResource("links.csv").getInputStream()))) {
+        try (BufferedReader brMovies = new BufferedReader(new InputStreamReader(new ClassPathResource("movies.small.csv").getInputStream()));
+              ) {
             String movieLine;
-            String linkLine;
-            brMovies.readLine();    // Skip header line
-            brLinks.readLine();     // Skip header line
             while ((movieLine = brMovies.readLine()) != null) {
-                linkLine = brLinks.readLine();
                 //taskExecutor.execute(new ProcessMovie(movieLine, linkLine));
-                new ProcessMovie(movieLine, linkLine).run();
+                new ProcessMovie(movieLine).run();
             }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -126,73 +77,235 @@ public class DataLoader implements ApplicationRunner {
         }
     }
 
-    private void populateScreeningsTable() throws CloneNotSupportedException {
-        /* schema.sql lists 5 theaters, generate 2 screenings randomly for
-         * each screen in each theater
-         */
-        for (int i = 1; i <= 5; i++) {
-            List<Screen> screens = screenRepository.findByTheatreId(i);
-            for (int j = 0; j < screens.size(); j++) {
-                Screening screening1 = new Screening();
-                Screening screening2 = new Screening();
+    private class ProcessCity implements Runnable {
+        private String cityLine;
 
-                screening1.setTheatreId(i);
-                screening1.setScreenId(j+1);
-                screening2.setTheatreId(i);
-                screening2.setScreenId(j+1);
+        ProcessCity(String cityLine) {
+            this.cityLine = cityLine;
+        }
 
-                // Randomly select 2 movies from the movies db, 1 each for each screen
-                long totalMovies = movieRepository.count();
-                Random random = new Random();
+        @Override
+        public void run() {
+            String[] cityInfo = cityLine.split(",");
 
-                long movieId1 = random.nextInt((int)totalMovies)+1;
-                Movie movie1 = null;
-                while ((movie1 = movieRepository.findByMovieId(movieId1)) == null)
-                    movieId1 = random.nextInt((int)totalMovies)+1;
+            City city = City.builder().cityId(Integer.valueOf(cityInfo[0])).cityName(cityInfo[1]).cityCode(cityInfo[2])
+                    .latitude(Double.valueOf(cityInfo[3])).longitude(Double.valueOf(cityInfo[4])).build();
 
-                long movieId2 = random.nextInt((int)totalMovies)+1;
-                Movie movie2 = null;
-                while ((movie2 = movieRepository.findByMovieId(movieId2)) == null)
-                    movieId2 = random.nextInt((int)totalMovies)+1;
+            cityRepository.save(city);
+        }
+    }
 
-                screening1.setMovieName(movie1.getMovieName());
-                screening2.setMovieName(movie2.getMovieName());
-
-                // Get a random date between current date and 3 days from current date
-                Date date1 = new Date((new java.util.Date()).getTime());
-                Date date2 = new Date(date1.getTime()+3*24*60*60*1000);
-                Date randomDate1 = new Date(ThreadLocalRandom.current().nextLong(date1.getTime(), date2.getTime()));
-                Date randomDate2 = new Date(ThreadLocalRandom.current().nextLong(date1.getTime(), date2.getTime()));
-
-                screening1.setScreeningDate(randomDate1);
-                screening2.setScreeningDate(randomDate2);
-
-                screening1.setBookedTickets(0);
-                screening2.setBookedTickets(0);
-
-                // 2 screenings per screen
-                screening1.setScreeningTime(Time.valueOf("10:00:00"));
-                screeningRepository.save(screening1);
-
-                Screening screening1Clone = (Screening)screening1.clone();
-                screening1.setScreeningTime(Time.valueOf("18:00:00"));
-                screeningRepository.save(screening1Clone);
-
-                if (randomDate1.getDate() != randomDate2.getDate()) {
-                    screening2.setScreeningTime(Time.valueOf("10:00:00"));
-                    screeningRepository.save(screening2);
-
-                    Screening screening2Clone = (Screening)screening2.clone();
-                    screening2.setScreeningTime(Time.valueOf("18:00:00"));
-                    screeningRepository.save(screening2Clone);
-                }
+    private void populateCityTable() {
+        try (BufferedReader brMovies = new BufferedReader(new InputStreamReader(new ClassPathResource("cities.small.csv").getInputStream()));
+        ) {
+            String movieLine;
+            while ((movieLine = brMovies.readLine()) != null) {
+                //taskExecutor.execute(new ProcessMovie(movieLine, linkLine));
+                new ProcessCity(movieLine).run();
             }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class ProcessTheatre implements Runnable {
+        private String theatreLine;
+
+        ProcessTheatre(String theatreLine) {
+            this.theatreLine = theatreLine;
+        }
+
+        @Override
+        public void run() {
+            String[] theatreInfo = theatreLine.split(",");
+
+            Theatre theatre = new Theatre();
+            theatre.setTheatreId(Long.parseLong(theatreInfo[0]));
+            theatre.setTheatreName(theatreInfo[1]);
+            theatre.setTheatreCity(Integer.parseInt(theatreInfo[2]));
+
+            theatreRepository.save(theatre);
+        }
+    }
+
+    private void populateTheatreTable() {
+        try (BufferedReader brMovies = new BufferedReader(new InputStreamReader(new ClassPathResource("theatre.small.csv").getInputStream()));
+        ) {
+            String theatreLine;
+            while ((theatreLine = brMovies.readLine()) != null) {
+                //taskExecutor.execute(new ProcessMovie(movieLine, linkLine));
+                new ProcessTheatre(theatreLine).run();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class ProcessScreen implements Runnable {
+        private String screenLine;
+
+        ProcessScreen(String screenLine) {
+            this.screenLine = screenLine;
+        }
+
+        @Override
+        public void run() {
+            String[] screenInfo = screenLine.split(",");
+
+            Screen screen = new Screen();
+            screen.setScreenId(Long.parseLong(screenInfo[0]));
+            screen.setSeatsNum(Integer.parseInt(screenInfo[1]));
+            screen.setScreeName(screenInfo[2]);
+            screen.setTheatreId(Long.parseLong(screenInfo[3]));
+
+            screenRepository.save(screen);
+        }
+    }
+
+    private void populateScreenTable() {
+        try (BufferedReader brMovies = new BufferedReader(new InputStreamReader(new ClassPathResource("screens.small.csv").getInputStream()));
+        ) {
+            String screenLine;
+            while ((screenLine = brMovies.readLine()) != null) {
+                //taskExecutor.execute(new ProcessMovie(movieLine, linkLine));
+                new ProcessScreen(screenLine).run();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class ProcessShow implements Runnable {
+        private String showLine;
+        private LocalDateTime localDateTime;
+
+        ProcessShow(String showLine, LocalDateTime localDateTime) {
+            this.showLine = showLine;
+            this.localDateTime = localDateTime;
+        }
+
+        @Override
+        public void run() {
+            String[] showInfo = showLine.split(",");
+
+            Show show = new Show();
+            show.setShowId(Long.parseLong(showInfo[0]));
+            show.setScreenId(Long.parseLong(showInfo[1]));
+            show.setMovie(Long.parseLong(showInfo[2]));
+            show.setScreeningDate(localDateTime);
+            show.setBookedTickets(0);
+
+            showRepository.save(show);
+        }
+    }
+
+    private void populateShowTable() {
+        int dateCount = 1;
+        int hourCount = 12;
+        try (BufferedReader brMovies = new BufferedReader(new InputStreamReader
+                (new ClassPathResource("shows.small.csv").getInputStream()));
+        ) {
+            String showLine;
+            while ((showLine = brMovies.readLine()) != null) {
+                new ProcessShow(showLine, LocalDateTime.of(2024, Month.JANUARY,
+                        getNumber(dateCount++), getNumber(hourCount++), 00, 00 )).run();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private Integer getNumber(int count) {
+        return count%2 == 0 ? 3: 6;
+    }
+
+    private class ProcessSeat implements Runnable {
+        private String seatLine;
+
+        ProcessSeat(String seatLine) {
+            this.seatLine = seatLine;
+        }
+
+        @Override
+        public void run() {
+            String[] seatInfo = seatLine.split(",");
+
+            Seat seat = new Seat();
+            seat.setSeatId(Long.parseLong(seatInfo[0]));
+            seat.setRowId(seatInfo[1].toCharArray()[0]);
+            seat.setRowNumber(Integer.parseInt(seatInfo[2]));
+            seat.setScreenId(Long.parseLong(seatInfo[3]));
+
+            seatRepository.save(seat);
+        }
+    }
+
+    private void populateSeatTable() {
+        try (BufferedReader brMovies = new BufferedReader(new InputStreamReader(new ClassPathResource("seats.small.csv").getInputStream()));
+        ) {
+            String seatLine;
+            while ((seatLine = brMovies.readLine()) != null) {
+                //taskExecutor.execute(new ProcessMovie(movieLine, linkLine));
+                new ProcessSeat(seatLine).run();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class ProcessUser implements Runnable {
+        private String userLine;
+
+        ProcessUser(String userLine) {
+            this.userLine = userLine;
+        }
+
+        @Override
+        public void run() {
+            String[] userInfo = userLine.split(",");
+
+            User user = new User();
+            user.setId(Long.parseLong(userInfo[0]));
+            user.setUsername(userInfo[1]);
+            user.setPassword(userInfo[2]);
+
+            userRepository.save(user);
+        }
+    }
+
+    private void populateUserTable() {
+        try (BufferedReader brMovies = new BufferedReader(new InputStreamReader(new ClassPathResource("users.small.csv").getInputStream()));
+        ) {
+            String seatLine;
+            while ((seatLine = brMovies.readLine()) != null) {
+                //taskExecutor.execute(new ProcessMovie(movieLine, linkLine));
+                new ProcessUser(seatLine).run();
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
     @Override
     public void run(ApplicationArguments applicationArguments) throws Exception {
         populateMovieTable();
-        populateScreeningsTable();
+        populateCityTable();
+        populateTheatreTable();
+        populateScreenTable();
+        populateShowTable();
+        populateSeatTable();
+        populateUserTable();
     }
 }
