@@ -5,6 +5,8 @@ import com.sapient.bookmymovie.constants.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -42,6 +44,9 @@ public class Booking {
     @Enumerated(EnumType.STRING)
     @Column(name = "PAYMENT_STATUS")
     private PaymentStatus paymentStatus;
+
+    @Column(name = "BOOKING_DATE")
+    private LocalDate bookingDate;
 
     public boolean isConfirmed() {
         return this.bookingStatus == BookingStatus.Confirmed;

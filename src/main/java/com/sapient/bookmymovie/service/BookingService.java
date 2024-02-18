@@ -17,6 +17,8 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +38,9 @@ public class BookingService {
 
     @Transactional
     public BookingResponse createBooking(BookingRequest bookingRequest) {
+        //we will move these to request interceptor ...
+        this.validateBookingRequest(bookingRequest);
+
         if(checkAnySeatAlreadyBooked(bookingRequest)) {
             throw new SeatPermanentlyUnavailableException("Selected seats already booked.");
         }
@@ -47,7 +52,7 @@ public class BookingService {
 
         Booking booking = Booking.builder().userId(bookingRequest.getUserId()).bookingStatus(BookingStatus.Created)
                 .paymentStatus(PaymentStatus.PAYMENT_INITIATED_AT_GATEWAY).showId(bookingRequest.getShowId())
-                        .seatsBooked(seatsToBeBooked) .build();
+                .bookingDate(bookingRequest.getBookingDate()).seatsBooked(seatsToBeBooked) .build();
 
         log.info("Saving Booking: " + booking);
 
@@ -146,5 +151,12 @@ public class BookingService {
                     log.info("Invalid Seat Status for Seat : " + seat);
                     throw new SeatNotLockedException("Seats should be locked.");
                 } );
+    }
+
+    private void validateBookingRequest(BookingRequest bookingRequest) {
+
+        if(bookingRequest.getBookingDate().isBefore(LocalDate.now())) {
+            throw new PastDateTicketBookingNotAllowedException("Past Date Booking is not Allowed");
+        }
     }
 }

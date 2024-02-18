@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class InvalidBookingException extends RuntimeException {
+public class PastDateTicketBookingNotAllowedException extends RuntimeException {
     private String msg;
+
 }

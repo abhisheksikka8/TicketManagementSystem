@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -18,4 +19,6 @@ public class BookingRequest {
     private Long showId;
     @NonNull 
     private List<Long> seats;
+    @NonNull
+    private LocalDate bookingDate;
 }
