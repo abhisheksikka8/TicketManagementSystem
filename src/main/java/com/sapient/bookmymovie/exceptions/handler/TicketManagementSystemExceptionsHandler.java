@@ -11,56 +11,56 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class TicketManagementSystemExceptionsHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(NoBookingPresentException.class)
+    @ExceptionHandler({NoBookingPresentException.class})
     protected ResponseEntity<BaseExceptionResponse> handleNoBookingPresentException(
             NoBookingPresentException ex) {
         logger.error("No Booking Found ex:{}", ex);
         return this.getResponse(ex, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(InvalidUserFoundForBookingException.class)
+    @ExceptionHandler({InvalidUserFoundForBookingException.class})
     protected ResponseEntity<BaseExceptionResponse> handleInvalidUserException(
             InvalidUserFoundForBookingException invalidUserFoundForBookingException) {
         logger.error("Invalid User ex:{}", invalidUserFoundForBookingException);
         return this.getResponse(invalidUserFoundForBookingException, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(InvalidBookingException.class)
+    @ExceptionHandler({InvalidBookingException.class})
     protected ResponseEntity<BaseExceptionResponse> handleInvalidUserException(
             InvalidBookingException invalidBookingException) {
         logger.error("Invalid Booking ex:{}", invalidBookingException);
         return this.getResponse(invalidBookingException, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(SeatPermanentlyUnavailableException.class)
+    @ExceptionHandler({SeatPermanentlyUnavailableException.class})
     protected ResponseEntity<BaseExceptionResponse> handleInvalidUserException(
             SeatPermanentlyUnavailableException seatPermanentlyUnavailableException) {
         logger.error("Seat Are Unavailable For Booking ex:{}", seatPermanentlyUnavailableException);
         return this.getResponse(seatPermanentlyUnavailableException, HttpStatus.NOT_ACCEPTABLE);
     }
 
-    @ExceptionHandler(SeatPermanentlyUnavailableException.class)
+    @ExceptionHandler({SeatTemporaryUnavailableException.class})
     protected ResponseEntity<BaseExceptionResponse> handleInvalidUserException(
             SeatTemporaryUnavailableException seatTemporaryUnavailableException) {
         logger.error("Some Seats are locked For Booking ex:{}", seatTemporaryUnavailableException);
         return this.getResponse(seatTemporaryUnavailableException, HttpStatus.PARTIAL_CONTENT);
     }
 
-    @ExceptionHandler(InvalidDateException.class)
+    @ExceptionHandler({InvalidDateException.class})
     protected ResponseEntity<BaseExceptionResponse> handleInvalidDateException(
             InvalidDateException invalidDateException) {
         logger.error("Invalid Date Selected. Past Dates are not supported. Ex:{}", invalidDateException);
         return this.getResponse(invalidDateException, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(NoTheatreFoundException.class)
+    @ExceptionHandler({NoTheatreFoundException.class})
     protected ResponseEntity<BaseExceptionResponse> handleNoTheatreFoundException(
             NoTheatreFoundException noTheatreFoundException) {
         logger.error("NO Theatre Found. Ex:{}", noTheatreFoundException);
         return this.getResponse(noTheatreFoundException, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(NoTheatreFoundException.class)
+    @ExceptionHandler({NoShowsFoundForCityAndDateException.class})
     protected ResponseEntity<BaseExceptionResponse> handleNoShowsFoundException(
             NoShowsFoundForCityAndDateException noShowsFoundForCityAndDateException) {
         logger.error("No Shows Found. Ex:{}", noShowsFoundForCityAndDateException);
