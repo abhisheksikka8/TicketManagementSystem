@@ -28,7 +28,7 @@ public class BookingController {
     }
 
     @PutMapping
-    public ResponseEntity<Booking> confirmBooking(@RequestBody PostPaymentBookingRequest bookingRequest) {
+    public ResponseEntity<BookingResponse> confirmBooking(@RequestBody PostPaymentBookingRequest bookingRequest) {
         log.info("Booking Confirmation Request: " + bookingRequest);
 
         return ResponseEntity.ok(bookingService.confirmBooking(bookingRequest));

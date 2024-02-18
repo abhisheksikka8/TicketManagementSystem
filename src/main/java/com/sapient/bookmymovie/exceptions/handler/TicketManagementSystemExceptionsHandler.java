@@ -53,6 +53,13 @@ public class TicketManagementSystemExceptionsHandler extends ResponseEntityExcep
         return this.getResponse(invalidDateException, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler({SeatNotLockedException.class})
+    protected ResponseEntity<BaseExceptionResponse> handleInvalidDateException(
+            SeatNotLockedException seatNotLockedException) {
+        logger.error("Invalid Seat Selected. Seat should be locked while confirmation. Ex:{}", seatNotLockedException);
+        return this.getResponse(seatNotLockedException, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler({NoTheatreFoundException.class})
     protected ResponseEntity<BaseExceptionResponse> handleNoTheatreFoundException(
             NoTheatreFoundException noTheatreFoundException) {

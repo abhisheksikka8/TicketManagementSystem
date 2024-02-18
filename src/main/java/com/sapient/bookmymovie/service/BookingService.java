@@ -55,11 +55,12 @@ public class BookingService {
 
         log.info("Final Booking : \n" + finalBooking );
         // Initiate Payment Here - Connect with Payment Gateways ...
-        return BookingResponse.builder().bookingId(finalBooking.getBookingId()).userId(finalBooking.getUserId()).build();
+        return BookingResponse.builder().bookingId(finalBooking.getBookingId()).userId(finalBooking.getUserId())
+                .bookingStatus(BookingStatus.Created).build();
     }
 
     @Transactional
-    public Booking confirmBooking(PostPaymentBookingRequest bookingRequest) {
+    public BookingResponse confirmBooking(PostPaymentBookingRequest bookingRequest) {
         Optional<Booking> booking = bookingRepository.findById(bookingRequest.getBookingId());
 
         this.validatePostPaymentBooking(booking, bookingRequest);
@@ -82,7 +83,8 @@ public class BookingService {
         seatLockProvider.unlockSeats(initiatedBooking.getSeatsBooked().stream().map(Seat::getSeatId).toList(),
                 initiatedBooking.getShowId(), bookingRequest.getUserId());
 
-        return confirmedBooking;
+        return BookingResponse.builder().bookingStatus(confirmedBooking.getBookingStatus()).bookingId(confirmedBooking.getBookingId())
+                .userId(confirmedBooking.getUserId()).build();
     }
 
     public Optional<Booking> getBooking(@NonNull final Long bookingId) {
@@ -140,8 +142,9 @@ public class BookingService {
         }
 
         booking.get().getSeatsBooked().stream().filter(seat -> !seatLockProvider.validateLock(initiatedBooking.getShowId(),
-                seat.getSeatId(), initiatedBooking.getUserId())).findAny().ifPresent(seat -> {log.info("Invalid Seat ");
-            throw new InvalidBookingException("Invalid Booking Request");} );
-
+                seat.getSeatId(), initiatedBooking.getUserId())).findAny().ifPresent(seat -> {
+                    log.info("Invalid Seat Status for Seat : " + seat);
+                    throw new SeatNotLockedException("Seats should be locked.");
+                } );
     }
 }
