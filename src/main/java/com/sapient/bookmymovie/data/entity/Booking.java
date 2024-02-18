@@ -27,7 +27,7 @@ public class Booking {
    @Column(name = "SHOW_ID")
     private Long showId;
 
-    @OneToMany
+    @ManyToMany
     @Column(name = "SEAT_ID")
     private List<Seat> seatsBooked;
 
